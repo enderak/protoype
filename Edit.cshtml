@@ -1,0 +1,37 @@
+@page
+@model EditModel
+
+<h2>Yemek Düzenle: @Model.Yemek.Ad</h2>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            
+            <input type="hidden" asp-for="Yemek.Id" /> 
+            
+            <div class="form-group">
+                <label asp-for="Yemek.Ad" class="control-label">Yemek Adı</label>
+                <input asp-for="Yemek.Ad" class="form-control" />
+                <span asp-validation-for="Yemek.Ad" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="Yemek.Kalori" class="control-label">Kalori (kcal)</label>
+                <input asp-for="Yemek.Kalori" class="form-control" type="number" />
+                <span asp-validation-for="Yemek.Kalori" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="Yemek.Icerikler" class="control-label">İçerikler</label>
+                <textarea asp-for="Yemek.Icerikler" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Yemek.Icerikler" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mt-3">
+                <input type="submit" value="Güncelle" class="btn btn-primary" />
+                <a asp-page="./Index" class="btn btn-secondary">İptal ve Listeye Dön</a>
+            </div>
+        </form>
+    </div>
+</div>
