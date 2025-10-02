@@ -1,8 +1,14 @@
-// Pages/Index.cshtml.cs (Kullanıcı Tarafı Ana Sayfa)
+// Pages/Yemekler/Index.cshtml.cs
 
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization; // Gerekli kütüphane
 
+// Sadece giriş yapan kullanıcıların erişimine izin verir
+[Authorize] 
 public class IndexModel : PageModel
 {
     private readonly ApplicationDbContext _context;
@@ -12,29 +18,25 @@ public class IndexModel : PageModel
         _context = context;
     }
 
-    // Seçili tarihi tutar ve formdan veri almayı destekler
-    [BindProperty(SupportsGet = true)]
-    public DateTime SeciliTarih { get; set; } = DateTime.Today;
-
-    // Menü kalemlerini (Yemek bilgileri ile birlikte) tutacak liste
-    public List<Menukalemi> GunlukMenu { get; set; } = new List<Menukalemi>();
-
-    // Öğün sıralaması için sabit bir liste
-    public List<string> OgunSirasi { get; } = new List<string> { "Sabah", "Öğle", "Akşam", "Gece" };
+    public IList<Yemek> Yemekler { get; set; } = default!; 
 
     public async Task OnGetAsync()
     {
-        // 1. Seçili tarihe ait menü kalemlerini SQLite'dan çek
-        GunlukMenu = await _context.Menuler
-            // Sorgu yaparken ilgili Yemek nesnesini de otomatik getir ('JOIN' işlemi gibi)
-            .Include(m => m.Yemek) 
-            .Where(m => m.Tarih.Date == SeciliTarih.Date)
-            .ToListAsync();
+        Yemekler = await _context.Yemekler.ToListAsync();
     }
     
-    // Yardımcı Metot: Öğüne göre menü kalemini bulur
-    public Menukalemi? GetOgunYemegi(string ogunAdi)
+    public async Task<IActionResult> OnPostDeleteAsync(int? id)
     {
-        return GunlukMenu.FirstOrDefault(m => m.Ogun == ogunAdi);
+        if (id == null) return NotFound();
+
+        var yemek = await _context.Yemekler.FindAsync(id);
+
+        if (yemek != null)
+        {
+            _context.Yemekler.Remove(yemek);
+            await _context.SaveChangesAsync();
+        }
+
+        return RedirectToPage("./Index");
     }
 }
